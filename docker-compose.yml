@@ -1,0 +1,12 @@
+services:
+  dbtellme:
+    image: dbtellme/dbtellme:latest
+    container_name: dbtellme
+    ports:
+      - "11234:11234"
+    volumes:
+      # Annotations kalıcı olsun — container yeniden başlayınca kaybolmasın
+      - ./annotations:/app/annotations
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

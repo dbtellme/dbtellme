@@ -1,0 +1,9 @@
+table: sale_order
+column: state
+description: "Lifecycle state of a sales order in Odoo."
+values:
+  draft: "Quotation — not yet confirmed"
+  sent: "Quotation sent to customer"
+  sale: "Sales order confirmed"
+  done: "Order locked (fully invoiced or delivered)"
+  cancel: "Cancelled"

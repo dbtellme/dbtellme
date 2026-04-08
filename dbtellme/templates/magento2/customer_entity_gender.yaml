@@ -1,0 +1,7 @@
+table: customer_entity
+column: gender
+description: "Customer gender attribute. Stored as integer referencing eav_attribute_option."
+values:
+  1: "Male"
+  2: "Female"
+  3: "Not Specified"

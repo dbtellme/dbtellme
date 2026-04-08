@@ -1,0 +1,6 @@
+table: buckets
+column: public
+description: "Controls whether files in this bucket are publicly accessible without authentication. If false, all access requires a signed URL or valid session."
+values:
+  true: "Public bucket — files accessible via public URL without auth"
+  false: "Private bucket — requires signed URL or authenticated session"

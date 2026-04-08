@@ -1,0 +1,12 @@
+table: wp_wc_orders
+column: status
+description: "Order lifecycle status in WooCommerce HPOS (High-Performance Order Storage). Replaces post_status for orders in WooCommerce 7.1+."
+values:
+  wc-pending: "Awaiting payment"
+  wc-processing: "Payment received, fulfillment in progress"
+  wc-on-hold: "Awaiting manual action or payment confirmation"
+  wc-completed: "Order fully fulfilled and closed"
+  wc-cancelled: "Cancelled by customer or admin"
+  wc-refunded: "Fully refunded"
+  wc-failed: "Payment failed or declined"
+  wc-checkout-draft: "Draft created during checkout, not yet placed"

@@ -1,0 +1,14 @@
+id: django
+name: "Django Framework"
+description: "Django web framework built-in tables. Covers auth, content types, and permissions."
+version: "1.0"
+db_types:
+  - postgresql
+  - mysql
+  - sqlite
+tables_covered:
+  - auth_user
+  - django_content_type
+  - auth_permission
+author: "dbtellme Community"
+annotation_count: 3

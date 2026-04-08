@@ -1,0 +1,14 @@
+table: wp_posts
+column: post_type
+description: "Content type stored in the wp_posts table. WooCommerce extends this with its own types."
+values:
+  post: "Standard blog post"
+  page: "Static page"
+  attachment: "Uploaded media file"
+  product: "WooCommerce product"
+  product_variation: "WooCommerce product variation"
+  shop_order: "WooCommerce order (legacy CPT)"
+  shop_order_refund: "WooCommerce refund record"
+  shop_coupon: "WooCommerce discount coupon"
+  revision: "Auto-revision of a post or page"
+  nav_menu_item: "Navigation menu item"

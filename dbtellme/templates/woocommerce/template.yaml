@@ -1,0 +1,13 @@
+id: woocommerce
+name: "WooCommerce"
+description: "WordPress WooCommerce e-commerce platform. Covers order status, post types, and product lifecycle columns."
+version: "1.0"
+db_types:
+  - mysql
+  - mariadb
+tables_covered:
+  - wp_posts
+  - wp_postmeta
+  - wp_wc_orders
+author: "dbtellme Community"
+annotation_count: 4

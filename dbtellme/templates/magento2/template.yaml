@@ -1,0 +1,13 @@
+id: magento2
+name: "Magento 2"
+description: "Adobe Commerce / Magento 2 open-source e-commerce platform. Covers order, product, and customer entity columns."
+version: "1.0"
+db_types:
+  - mysql
+  - mariadb
+tables_covered:
+  - sales_order
+  - catalog_product_entity
+  - customer_entity
+author: "dbtellme Community"
+annotation_count: 3

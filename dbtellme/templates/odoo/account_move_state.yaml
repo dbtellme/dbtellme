@@ -1,0 +1,7 @@
+table: account_move
+column: state
+description: "Status of an accounting entry (invoice, bill, or journal entry)."
+values:
+  draft: "Draft — not yet posted to ledger"
+  posted: "Confirmed and posted to the accounting ledger"
+  cancel: "Cancelled entry"

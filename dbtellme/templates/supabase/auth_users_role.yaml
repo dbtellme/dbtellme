@@ -1,0 +1,7 @@
+table: users
+column: role
+description: "The database role assigned to this user. Controls RLS policy evaluation and API access level in Supabase."
+values:
+  authenticated: "Logged-in user — subject to RLS policies with auth.uid()"
+  anon: "Anonymous / unauthenticated user — subject to anon RLS policies"
+  service_role: "Service role — bypasses all RLS policies (server-side only)"

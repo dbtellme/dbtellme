@@ -1,0 +1,6 @@
+table: auth_user
+column: is_staff
+description: "Grants access to the Django admin interface (/admin/). Does not imply superuser."
+values:
+  0: "Regular user — no admin access"
+  1: "Staff user — can log into Django admin"

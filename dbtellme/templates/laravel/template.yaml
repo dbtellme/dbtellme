@@ -1,0 +1,15 @@
+id: laravel
+name: "Laravel Framework"
+description: "Laravel PHP framework default migration tables. Covers users, jobs, and Sanctum tokens."
+version: "1.0"
+db_types:
+  - mysql
+  - postgresql
+  - sqlite
+tables_covered:
+  - users
+  - jobs
+  - failed_jobs
+  - personal_access_tokens
+author: "dbtellme Community"
+annotation_count: 3

@@ -1,0 +1,6 @@
+table: users
+column: email_confirmed_at
+description: "Timestamp of when the user confirmed their email address. NULL means the user has not yet verified their email. Supabase Auth sets this automatically upon verification."
+values:
+  "NULL": "Email not yet verified — user cannot access email-protected routes"
+  "timestamp": "Email verified at this datetime (UTC)"

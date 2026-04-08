@@ -1,0 +1,13 @@
+table: sales_order
+column: status
+description: "Lifecycle status of a sales order in Magento 2."
+values:
+  pending: "Order placed, payment not yet captured"
+  pending_payment: "Awaiting payment gateway confirmation"
+  payment_review: "Order flagged for payment review"
+  processing: "Payment captured, being fulfilled"
+  suspected_fraud: "Flagged as potentially fraudulent"
+  holded: "Manually placed on hold"
+  complete: "Shipped and invoiced"
+  closed: "Fully refunded or credited"
+  canceled: "Cancelled before fulfillment"

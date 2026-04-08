@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dbtellme — Premium Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <header>
+        <div class="logo-section">
+            <div class="logo-icon">DB</div>
+            <h1>DBContext <span>AI</span></h1>
+        </div>
+        <div class="header-actions">
+            <span id="current-db-status" class="status-badge">Not Connected</span>
+            <button id="btn-open-connect" class="glow-button">Change Connection <i data-lucide="database"></i></button>
+        </div>
+    </header>
+
+    <div id="connect-overlay" class="modal-overlay">
+        <div id="connect-modal" class="modal">
+            <h2><i data-lucide="shield-check"></i> Database Connection</h2>
+            <p class="subtitle">Select your database type and provide credentials</p>
+
+            <!-- Recent Connections -->
+            <div id="recent-connections" class="recent-section" style="display:none;">
+                <div class="recent-header">
+                    <span class="recent-title"><i data-lucide="clock"></i> Recent Connections</span>
+                </div>
+                <div id="recent-list" class="recent-list">
+                    <!-- Filled dynamically -->
+                </div>
+                <div class="section-divider"><span>or connect manually</span></div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label>Project / Connection Name <span style="color:var(--text-dim); font-weight:normal;">(Required for saving annotations)</span></label>
+                <input type="text" id="project-name" placeholder="e.g. E-Commerce v2 or Local Test DB" style="width: 100%;" required>
+            </div>
+
+            <div class="db-tabs">
+                <button class="tab-btn active" data-type="sqlite">SQLite</button>
+                <button class="tab-btn" data-type="remote">Host Settings</button>
+                <button class="tab-btn" data-type="uri">Custom URI</button>
+            </div>
+
+            <div id="tab-content-sqlite" class="tab-content active">
+                <div class="form-group">
+                    <label>SQLite File Path</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="sqlite-path" placeholder="e.g. C:/data/db.sqlite" value="sample.db">
+                        <button id="btn-browse" class="secondary-button">Browse <i data-lucide="folder"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-content-remote" class="tab-content">
+                <div class="grid-form">
+                    <div class="form-group">
+                        <label>DB Type</label>
+                        <select id="remote-type">
+                            <option value="postgresql">PostgreSQL</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="mssql">SQL Server</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Host</label><input type="text" id="db-host" placeholder="localhost"></div>
+                    <div class="form-group"><label>Port</label><input type="text" id="db-port" placeholder="5432"></div>
+                    <div class="form-group"><label>Username</label><input type="text" id="db-user"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="db-pass"></div>
+                    <div class="form-group"><label>DB Name</label><input type="text" id="db-name"></div>
+                </div>
+            </div>
+
+            <div id="tab-content-uri" class="tab-content">
+                <div class="form-group">
+                    <label>Connection String (URI)</label>
+                    <input type="text" id="db-uri" placeholder="postgresql://user:pass@host:port/dbname">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Annotation Template (Optional)</label>
+                <select id="template-select" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white;">
+                    <option value="">— Start Empty —</option>
+                </select>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 5px;">Starting with a template will pre-populate common table & column descriptions.</p>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="btn-connect-modal" class="glow-button full-width">Connect to Database</button>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <aside id="sidebar">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin:0;"><i data-lucide="database"></i> Tables</h3>
+            </div>
+            <div style="position: relative; margin-bottom: 15px;">
+                <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; color: var(--text-dim);"></i>
+                <input type="text" id="table-search-input" placeholder="Search tables..." style="width: 100%; padding: 8px 10px 8px 32px; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; font-size: 0.85rem;">
+            </div>
+            <ul id="table-list">
+                <li class="empty-msg">Connect to a database first</li>
+            </ul>
+        </aside>
+
+        <section id="content">
+            <div id="view-switcher" class="view-header">
+                <div class="view-tabs">
+                    <button class="view-tab active" data-view="grid"><i data-lucide="layout-grid"></i> Table View</button>
+                    <button class="view-tab" data-view="diagram"><i data-lucide="share-2"></i> Schema Diagram</button>
+                </div>
+                <div class="actions" style="display: flex; gap: 8px; align-items: center;">
+                    <style>
+                        .stale-badge { 
+                            background: rgba(255, 165, 0, 0.15); 
+                            border: 1px solid orange; 
+                            color: orange; 
+                            font-size: 0.7rem; 
+                            padding: 2px 6px; 
+                            border-radius: 4px; 
+                            display: flex; 
+                            align-items: center; 
+                            gap: 4px;
+                            animation: pulse 2s infinite;
+                        }
+                        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+                    </style>
+                    <input type="file" id="import-file-input" style="display:none;" accept=".md,.txt,.yaml">
+                    <button id="btn-import-docs" class="secondary-button" title="Import annotations from MD/Text"><i data-lucide="upload" style="width: 14px; height: 14px;"></i> Import Docs</button>
+                    
+                    <div id="stale-warning-rag" class="stale-badge" style="display:none" title="Schema/Annotations changed since last export"><i data-lucide="alert-triangle" style="width:12px"></i> Stale</div>
+                    <button id="btn-export-rag" class="secondary-button" title="Export chunks specifically formatted for RAG Vector Databases">Export RAG <i data-lucide="blocks"></i></button>
+                    
+                    <div id="stale-warning-finetune" class="stale-badge" style="display:none" title="Schema/Annotations changed since last export"><i data-lucide="alert-triangle" style="width:12px"></i> Stale</div>
+                    <button id="btn-export-finetune" class="secondary-button" title="Generate prompt-completion pairs to fine-tune an LLM">Export Fine-Tune <i data-lucide="file-json"></i></button>
+                    
+                    <div id="stale-warning-export" class="stale-badge" style="display:none" title="Schema/Annotations changed since last export"><i data-lucide="alert-triangle" style="width:12px"></i> Stale</div>
+                    <button id="btn-export" class="secondary-button" title="Export full Markdown context">Export AI Context <i data-lucide="download"></i></button>
+                </div>
+            </div>
+
+            <div id="grid-view" class="view-pane active">
+                <div id="table-header">
+                    <div class="table-info-block">
+                        <div class="table-title-row">
+                            <span class="scope-label">TABLE SCOPE</span>
+                            <h2 id="current-table-name">Select a table</h2>
+                        </div>
+                        <div class="table-description-row">
+                            <input type="text" id="table-desc-input" placeholder="Table-level purpose (What does this table represent overall?)">
+                            <button id="btn-save-table-desc" class="mini-button" title="Save Table Info"><i data-lucide="save"></i></button>
+                        </div>
+                        <div class="table-sql-row" style="margin-top: 10px; max-width: 636px; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <label style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Usage Notes / Queries</label>
+                                <button id="btn-add-sql" class="mini-button" title="Add a new note or query block"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add Note / Query</button>
+                            </div>
+                            <div id="sql-boxes-container"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="columns-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border);">
+                    <h3 style="margin: 0; font-size: 0.95rem; font-weight: 500; color: var(--text-dim);">Columns (<span id="column-count">0</span>)</h3>
+                    <div style="position: relative; width: 220px;">
+                        <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; color: var(--text-dim);"></i>
+                        <input type="text" id="column-search-input" placeholder="Search columns..." style="width: 100%; padding: 6px 10px 6px 30px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; font-size: 0.85rem;">
+                    </div>
+                </div>
+                
+                <div id="columns-grid">
+                    <!-- Column cards go here -->
+                </div>
+            </div>
+
+            <div id="diagram-view" class="view-pane">
+                <div class="diagram-toolbar">
+                    <div class="toolbar-info">
+                        <h2>Entity Relationship Diagram</h2>
+                        <p>Solid lines = DB FK &nbsp;|&nbsp; Dashed lines = Virtual FK (user-defined)</p>
+                    </div>
+                    <div class="zoom-controls">
+                        <button id="zoom-in" title="Zoom In"><i data-lucide="plus"></i></button>
+                        <button id="zoom-out" title="Zoom Out"><i data-lucide="minus"></i></button>
+                        <button id="zoom-reset" title="Reset Zoom"><i data-lucide="refresh-cw"></i></button>
+                    </div>
+                </div>
+                <div id="mermaid-container" class="mermaid-box">
+                    <div id="mermaid-wrapper">
+                        <!-- Mermaid SVG will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Annotation Modal -->
+    <div id="modal-overlay" class="hidden">
+        <div id="modal">
+            <div class="modal-header">
+                <span id="modal-scope-label" class="scope-label">COLUMN SCOPE</span>
+                <h3 id="modal-title">Edit Annotation</h3>
+                <p id="modal-subtitle" class="subtitle">Annotating Table > Column</p>
+            </div>
+            <div class="form-group">
+                <label>Description / Business Logic</label>
+                <textarea id="edit-description" placeholder="e.g. 1: Active, 0: Passive or specific logic notes"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Enum Values / Mapping (JSON)</label>
+                <textarea id="edit-values" placeholder='{"1": "Active", "0": "Passive"}'></textarea>
+            </div>
+            <div class="form-group relation-group">
+                <label><i data-lucide="link"></i> Define Relationship (Virtual FK)</label>
+                <div class="relation-flow">
+                    <div class="relation-source">
+                        <span class="relation-label">FROM</span>
+                        <span id="relation-from" class="relation-value">table.column</span>
+                    </div>
+                    <span class="relation-arrow">→</span>
+                    <div class="relation-target">
+                        <span class="relation-label">TO</span>
+                        <select id="edit-ref-table">
+                            <option value="">— No Relation —</option>
+                        </select>
+                        <span class="relation-dot">.</span>
+                        <select id="edit-ref-column">
+                            <option value="id">id</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="btn-close-modal">Cancel</button>
+                <button id="btn-save-modal" class="glow-button">Save Annotation</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

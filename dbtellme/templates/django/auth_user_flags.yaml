@@ -1,0 +1,6 @@
+table: auth_user
+column: is_active
+description: "Controls whether this user account is enabled. Deactivating is preferred over deletion."
+values:
+  0: "Inactive — login disabled"
+  1: "Active — login allowed"

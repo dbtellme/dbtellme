@@ -1,0 +1,10 @@
+table: purchase_order
+column: state
+description: "Lifecycle state of a purchase order in Odoo."
+values:
+  draft: "Draft RFQ (Request for Quotation)"
+  sent: "RFQ sent to vendor"
+  to approve: "Waiting for purchase manager approval"
+  purchase: "Purchase order confirmed"
+  done: "Order locked"
+  cancel: "Cancelled"

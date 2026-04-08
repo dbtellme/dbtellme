@@ -1,0 +1,6 @@
+table: sessions
+column: factor_type
+description: "Indicates the authentication factor used to create this session."
+values:
+  aal1: "AAL1 — Single factor authentication (password or magic link)"
+  aal2: "AAL2 — Multi-factor authentication (TOTP or phone OTP verified)"

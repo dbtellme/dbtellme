@@ -1,0 +1,5 @@
+table: objects
+column: bucket_id
+description: "Foreign key referencing storage.buckets.id. Identifies which bucket this object belongs to. All file operations should go through the Supabase Storage API, not direct SQL."
+ref_table: buckets
+ref_column: id

@@ -1,0 +1,6 @@
+table: wp_wc_orders
+column: type
+description: "Order type in WooCommerce HPOS. Distinguishes between regular orders and refunds."
+values:
+  shop_order: "Standard customer order"
+  shop_order_refund: "Refund record linked to an order"

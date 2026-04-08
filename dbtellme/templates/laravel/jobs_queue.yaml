@@ -1,0 +1,9 @@
+table: jobs
+column: queue
+description: "The queue channel this job is dispatched to. Maps to Laravel queue worker --queue option."
+values:
+  default: "Default queue — processed by workers with no specific queue"
+  high: "High priority queue — processed before default"
+  low: "Low priority queue — processed after default"
+  emails: "Dedicated queue for email dispatch jobs"
+  notifications: "Dedicated queue for push/SMS notifications"

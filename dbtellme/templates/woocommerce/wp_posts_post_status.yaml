@@ -1,0 +1,12 @@
+table: wp_posts
+column: post_status
+description: "Publication status of a WordPress content item."
+values:
+  publish: "Published and publicly visible"
+  future: "Scheduled for future publication"
+  draft: "Saved as draft, not published"
+  pending: "Pending editorial review"
+  private: "Published but visible only to admins"
+  trash: "Moved to trash"
+  auto-draft: "Auto-saved draft (unsaved post)"
+  inherit: "Inherits status from parent post"

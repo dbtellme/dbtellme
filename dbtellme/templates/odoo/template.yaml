@@ -1,0 +1,13 @@
+id: odoo
+name: "Odoo (Community / Enterprise)"
+description: "Odoo open-source ERP platform. Covers sales, purchase, accounting, and partner columns."
+version: "1.0"
+db_types:
+  - postgresql
+tables_covered:
+  - sale_order
+  - purchase_order
+  - account_move
+  - res_partner
+author: "dbtellme Community"
+annotation_count: 4

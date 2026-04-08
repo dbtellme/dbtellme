@@ -1,0 +1,6 @@
+table: personal_access_tokens
+column: tokenable_type
+description: "Polymorphic relation — the Eloquent model class this token belongs to (Laravel Sanctum)."
+values:
+  "App\\Models\\User": "Token belongs to an application user"
+  "App\\Models\\Admin": "Token belongs to an admin model (if separate)"

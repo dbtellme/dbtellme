@@ -1,0 +1,10 @@
+table: catalog_product_entity
+column: type_id
+description: "Defines how the product behaves and is displayed in the catalog."
+values:
+  simple: "Single standalone product with no variations"
+  configurable: "Product with selectable options (size, color) backed by simple products"
+  grouped: "Collection of simple products sold together"
+  virtual: "Non-physical product (service, subscription)"
+  bundle: "Dynamic bundle of child products"
+  downloadable: "Digital product with downloadable files or links"

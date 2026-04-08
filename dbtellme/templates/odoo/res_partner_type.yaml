@@ -1,0 +1,9 @@
+table: res_partner
+column: type
+description: "Defines the role of an address record linked to a partner."
+values:
+  contact: "General contact (default)"
+  invoice: "Billing / invoice address"
+  delivery: "Shipping / delivery address"
+  other: "Other address type"
+  private: "Private address (employees only)"

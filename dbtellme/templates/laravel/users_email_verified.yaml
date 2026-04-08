@@ -1,0 +1,6 @@
+table: users
+column: email_verified_at
+description: "Timestamp of email verification. NULL means the user has not yet verified their email address."
+values:
+  "NULL": "Email not verified — user cannot access verified-only routes"
+  "timestamp": "Email verified at this datetime"

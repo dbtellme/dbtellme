@@ -1,0 +1,13 @@
+id: supabase
+name: "Supabase"
+description: "Supabase open-source Firebase alternative. Covers auth, storage, and public schema conventions. Uses PostgreSQL under the hood — no extra connector needed."
+version: "1.0"
+db_types:
+  - postgresql
+tables_covered:
+  - auth.users
+  - auth.sessions
+  - storage.buckets
+  - storage.objects
+author: "dbtellme Community"
+annotation_count: 5

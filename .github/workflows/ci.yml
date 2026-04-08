@@ -1,0 +1,46 @@
+name: Validate Templates & Run Tests
+
+on:
+  pull_request:
+    paths:
+      - 'dbtellme/templates/**'
+      - 'tests/**'
+      - 'dbtellme/**'
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run all tests
+        run: pytest tests/ -v --tb=short
+
+  validate-templates:
+    name: Validate Template Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate all templates
+        run: python .github/scripts/validate_templates.py

@@ -1,0 +1,6 @@
+table: auth_user
+column: is_superuser
+description: "Superuser has all permissions without explicitly assigning them."
+values:
+  0: "Standard user"
+  1: "Superuser — bypasses all permission checks"

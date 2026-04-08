@@ -1,0 +1,36 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+dist/
+build/
+
+# Local data
+annotations/
+*.db
+*.sqlite
+*.sqlite3
+dbcontext_history.db
+sample.db
+
+# Dev & docs
+.github/
+tests/
+*.md
+!README.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
