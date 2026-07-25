@@ -1,0 +1,99 @@
+# syntax=docker/dockerfile:1
+#
+# dbtellme — local-first schema enrichment for AI pipelines
+#
+# Build:  docker build -t dbtellme/dbtellme:latest .
+# Run:    docker run -p 11234:11234 -v ./annotations:/app/annotations dbtellme/dbtellme
+#
+# WORKDIR must stay /app: dbtellme/web/app.py resolves ANNOTATIONS_DIR and
+# HISTORY_DB relative to os.getcwd(), and docker-compose.yml mounts
+# ./annotations -> /app/annotations.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 1 — builder: compile wheels into an isolated venv
+# ─────────────────────────────────────────────────────────────────────────────
+FROM python:3.11-slim-bookworm AS builder
+
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# unixodbc-dev + gcc are only needed if pyodbc has to build from source
+# (no prebuilt wheel for the target arch). Discarded with this stage.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /src
+
+# Copy metadata first so the dependency layer caches independently of source churn
+COPY pyproject.toml README.md LICENSE ./
+COPY dbtellme ./dbtellme
+
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install ".[all-db]"
+
+# Fail the build early if package data was dropped (see pyproject package-data).
+# Cheaper to catch here than to ship a broken image.
+RUN python -c "\
+from dbtellme.templates import TemplateManager; \
+from dbtellme.web.app import app; \
+t = TemplateManager().list_templates(); \
+assert t, 'annotation templates missing from installed package'; \
+r = app.test_client().get('/'); \
+assert r.status_code == 200, f'UI returned {r.status_code}'; \
+print(f'packaging OK — {len(t)} templates, UI 200')"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 2 — runtime
+# ─────────────────────────────────────────────────────────────────────────────
+FROM python:3.11-slim-bookworm AS runtime
+
+LABEL org.opencontainers.image.title="dbtellme" \
+      org.opencontainers.image.description="Bridge your database to AI pipelines — without touching your schema." \
+      org.opencontainers.image.source="https://github.com/dbtellme/dbtellme" \
+      org.opencontainers.image.licenses="MIT"
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+# unixodbc = pyodbc runtime; msodbcsql18 = the actual SQL Server driver.
+# Drop this whole RUN block if you don't need MSSQL — saves roughly 120 MB.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates gnupg unixodbc \
+    && curl -fsSL -o /tmp/ms-prod.deb \
+        https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
+    && dpkg -i /tmp/ms-prod.deb \
+    && rm /tmp/ms-prod.deb \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql18 \
+    && apt-get purge -y --auto-remove curl gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /opt/venv /opt/venv
+
+# UID 1000 matches the default first user on most Linux hosts, so a bind-mounted
+# ./annotations created by that user stays writable. If Docker creates the
+# directory for you it will be root-owned — run `mkdir -p annotations` on the
+# host first, or override with `user: "${UID}:${GID}"` in docker-compose.
+RUN useradd --uid 1000 --create-home --shell /usr/sbin/nologin dbtellme \
+    && mkdir -p /app/annotations \
+    && chown -R dbtellme:dbtellme /app
+
+WORKDIR /app
+USER dbtellme
+
+EXPOSE 11234
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request,sys; \
+sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:11234/', timeout=4).status == 200 else 1)"
+
+# 0.0.0.0 is required inside a container. Note that the dashboard has no
+# authentication — publish the port to 127.0.0.1 only, or put it behind a proxy.
+CMD ["dbtellme", "ui", "--host", "0.0.0.0", "--port", "11234"]
